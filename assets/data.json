@@ -1,0 +1,8 @@
+{
+"items": [
+    { "nome": "Cadeira Gamer", "categoria": "Móveis", "preco": 899.90 },
+    { "nome": "Notebook Dell XPS", "categoria": "Informática", "preco": 8499.00 },
+    { "nome": "Smartphone Galaxy S23", "categoria": "Telefonia", "preco": 4999.99 },
+    { "nome": "Headset Logitech G435", "categoria": "Acessórios", "preco": 429.00 }
+  ]
+}
