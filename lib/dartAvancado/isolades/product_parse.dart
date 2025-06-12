@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:isolate';
 
 import 'package:flutter/material.dart';
 
@@ -17,18 +18,32 @@ class _ProductParseState extends State<ProductParse> {
     super.initState();
     _items = loadJson();
   }
+//ler os dados do JSON sem isolate
+/* Future<List<dynamic>> loadJson() async{
+  final jsonString = await DefaultAssetBundle.of(context)
+    .loadString('assets/data.json'); 
+  final parsed = json.decode(jsonString);
+  return parsed['items'] as List<dynamic>;
+} */
 
-  // Ler dados do json
-  Future<List<dynamic>> loadJson() async {
-    final jsonString = await DefaultAssetBundle.of(context).loadString("assets/data.json");
+//USANDO ISOLATE
+
+Future<List<dynamic>> loadJson()async{
+  final jsonString = await DefaultAssetBundle.of(context)
+  .loadString('assets/data.json');
+
+  return await Isolate.run((){
     final parsed = json.decode(jsonString);
     return parsed['items'] as List<dynamic>;
-  }
+  });
+}
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Parse de produtos")),
+      appBar: AppBar(title: const Text("Parse de produtos"),
+      backgroundColor: Colors.blue),
+      backgroundColor: const Color.fromARGB(255, 0, 0, 0),
       body: FutureBuilder<List<dynamic>>(
         future: _items,
         builder: (context, snapshot) {
@@ -55,7 +70,7 @@ class _ProductParseState extends State<ProductParse> {
               itemBuilder: (context, index) {
                 final product = products[index];
                 return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+                  margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 10),
                   elevation: 4,
                   child: ListTile(
                     title: Text(
