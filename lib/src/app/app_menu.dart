@@ -8,7 +8,7 @@ final List<MenuModel> appMenuItems = [
   MenuModel(
     title: 'Home',
     icon: Icons.home_rounded,
-    route: '/home',
+    route: '/Home',
     page: const HomeView(),
   ),
   MenuModel(
