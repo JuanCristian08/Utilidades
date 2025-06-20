@@ -23,18 +23,18 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
   }
 
   Future<double> _carregarTemperaturaInicial() async {
-    await Future.delayed(const Duration(seconds: 2)); // Simula carregamento
-    return 25.0; // Temperatura inicial fictícia
+    await Future.delayed(const Duration(seconds: 2));
+    return 25.0;
   }
 
   Stream<double> _simularTemperatura() async* {
     double temperaturaAtual = 25.0;
     while (true) {
-      await Future.delayed(const Duration(seconds: 2)); // Simula variação
-      temperaturaAtual += (1 - 2 * (DateTime.now().second % 2)); // Variação fictícia
+      await Future.delayed(const Duration(seconds: 2));
+      temperaturaAtual += (1 - 2 * (DateTime.now().second % 2));
       _historicoTemperaturas.add(temperaturaAtual);
       if (_historicoTemperaturas.length > 10) {
-        _historicoTemperaturas.removeAt(0); // Mantém os últimos 10 valores
+        _historicoTemperaturas.removeAt(0);
       }
       yield temperaturaAtual;
     }
@@ -42,7 +42,10 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
 
   void _calcularMediaEmIsolate() async {
     final receivePort = ReceivePort();
-    await Isolate.spawn(_calcularMedia, [receivePort.sendPort, _historicoTemperaturas]);
+    await Isolate.spawn(_calcularMedia, [
+      receivePort.sendPort,
+      _historicoTemperaturas,
+    ]);
     receivePort.listen((resultado) {
       setState(() {
         _mediaTemperaturas = resultado;
@@ -62,6 +65,7 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Conversor de Temperatura"),
+        centerTitle: true,
         flexibleSpace: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
@@ -73,7 +77,7 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
         ),
       ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -85,7 +89,7 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
                 } else if (snapshot.hasError) {
                   return Text("Erro: ${snapshot.error}");
                 } else if (snapshot.hasData) {
-                  return Text("Temperatura inicial: ${snapshot.data}°C");
+                  return Text("Temperatura inicial: wi ${snapshot.data}°C");
                 } else {
                   return const Text("Nenhuma temperatura encontrada.");
                 }
@@ -110,7 +114,10 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
             ElevatedButton(
               onPressed: _calcularMediaEmIsolate,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 24,
+                  vertical: 12,
+                ),
                 backgroundColor: const Color(0xFF8E2DE2),
                 foregroundColor: Colors.white,
               ),
