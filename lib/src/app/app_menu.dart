@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:utilidades/src/models/menu_model.dart';
 import 'package:utilidades/src/views/about_view.dart';
+import 'package:utilidades/src/views/conversor_temperatura.dart';
 import 'package:utilidades/src/views/converter_view.dart';
 import 'package:utilidades/src/views/home_view.dart';
 
@@ -49,6 +50,13 @@ final List<MenuModel> appMenuItems = [
   route: "/converter-medidas", 
   page: const ConverterView(), 
 ),
+
+  MenuModel(
+    title: "Temperatura Conversor",
+    icon: Icons.thermostat_outlined,
+    route: "/converter-temperatura",
+    page: const ConversorTemperatura(),
+  ),
 
 
   
