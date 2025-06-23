@@ -1,63 +1,33 @@
-import 'dart:async';
-import 'dart:isolate';
 import 'package:flutter/material.dart';
+import '../controllers/temperatura_controller.dart';
 
-class ConversorTemperatura extends StatefulWidget {
-  const ConversorTemperatura({Key? key}) : super(key: key);
+class ConversorTemperaturaView extends StatefulWidget {
+  const ConversorTemperaturaView({Key? key}) : super(key: key);
 
   @override
-  State<ConversorTemperatura> createState() => _ConversorTemperaturaState();
+  State<ConversorTemperaturaView> createState() => _ConversorTemperaturaViewState();
 }
 
-class _ConversorTemperaturaState extends State<ConversorTemperatura> {
+class _ConversorTemperaturaViewState extends State<ConversorTemperaturaView> {
+  final TemperaturaController _controller = TemperaturaController();
+
   late Future<double> _temperaturaInicial;
   late Stream<double> _streamTemperatura;
-  List<double> _historicoTemperaturas = [];
   double? _mediaTemperaturas;
 
   @override
   void initState() {
     super.initState();
-    _temperaturaInicial = _carregarTemperaturaInicial();
-    _streamTemperatura = _simularTemperatura();
+    _temperaturaInicial = _controller.carregarTemperaturaInicial();
+    _streamTemperatura = _controller.simularTemperatura();
   }
 
-  Future<double> _carregarTemperaturaInicial() async {
-    await Future.delayed(const Duration(seconds: 2));
-    return 25.0;
-  }
-
-  Stream<double> _simularTemperatura() async* {
-    double temperaturaAtual = 25.0;
-    while (true) {
-      await Future.delayed(const Duration(seconds: 2));
-      temperaturaAtual += (1 - 2 * (DateTime.now().second % 2));
-      _historicoTemperaturas.add(temperaturaAtual);
-      if (_historicoTemperaturas.length > 10) {
-        _historicoTemperaturas.removeAt(0);
-      }
-      yield temperaturaAtual;
-    }
-  }
-
-  void _calcularMediaEmIsolate() async {
-    final receivePort = ReceivePort();
-    await Isolate.spawn(_calcularMedia, [
-      receivePort.sendPort,
-      _historicoTemperaturas,
-    ]);
-    receivePort.listen((resultado) {
+  void _onCalcularMedia() {
+    _controller.calcularMediaEmIsolate((resultado) {
       setState(() {
         _mediaTemperaturas = resultado;
       });
     });
-  }
-
-  static void _calcularMedia(List<dynamic> args) {
-    final sendPort = args[0] as SendPort;
-    final temperaturas = args[1] as List<double>;
-    final media = temperaturas.reduce((a, b) => a + b) / temperaturas.length;
-    sendPort.send(media);
   }
 
   @override
@@ -89,7 +59,7 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
                 } else if (snapshot.hasError) {
                   return Text("Erro: ${snapshot.error}");
                 } else if (snapshot.hasData) {
-                  return Text("Temperatura inicial: wi ${snapshot.data}°C");
+                  return Text("Temperatura inicial: ${snapshot.data}°C");
                 } else {
                   return const Text("Nenhuma temperatura encontrada.");
                 }
@@ -112,12 +82,9 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
             ),
             const SizedBox(height: 16),
             ElevatedButton(
-              onPressed: _calcularMediaEmIsolate,
+              onPressed: _onCalcularMedia,
               style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 backgroundColor: const Color(0xFF8E2DE2),
                 foregroundColor: Colors.white,
               ),
@@ -134,7 +101,7 @@ class _ConversorTemperaturaState extends State<ConversorTemperatura> {
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(12),
-                  boxShadow: [
+                  boxShadow: const [
                     BoxShadow(
                       color: Colors.black26,
                       blurRadius: 8,
